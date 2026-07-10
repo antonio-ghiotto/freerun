@@ -77,22 +77,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SentieroLab — Analisi GPX & Escursionismo" },
+      { title: "FreeRun" },
       {
         name: "description",
         content:
-          "PWA offline per escursionismo: carica tracce GPX, profilo altimetrico, statistiche, difficoltà CAI e archivio locale.",
+          "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline.",
       },
       { name: "author", content: "SentieroLab" },
       { name: "theme-color", content: "#1f6b3a" },
-      { property: "og:title", content: "SentieroLab — Analisi GPX & Escursionismo" },
+      { property: "og:title", content: "FreeRun" },
       {
         property: "og:description",
         content:
-          "Carica tracce GPX, visualizzale su OpenStreetMap, analizza profilo altimetrico e difficoltà.",
+          "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "FreeRun" },
+      { name: "twitter:description", content: "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

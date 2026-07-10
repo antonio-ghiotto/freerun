@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SentieroLab — Analisi tracce GPX per escursionismo" },
+      { title: "FreeRun" },
       {
         name: "description",
         content:
