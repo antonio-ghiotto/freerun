@@ -77,22 +77,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "SentieroLab — Analisi GPX & Escursionismo" },
+      {
+        name: "description",
+        content:
+          "PWA offline per escursionismo: carica tracce GPX, profilo altimetrico, statistiche, difficoltà CAI e archivio locale.",
+      },
+      { name: "author", content: "SentieroLab" },
+      { name: "theme-color", content: "#1f6b3a" },
+      { property: "og:title", content: "SentieroLab — Analisi GPX & Escursionismo" },
+      {
+        property: "og:description",
+        content:
+          "Carica tracce GPX, visualizzale su OpenStreetMap, analizza profilo altimetrico e difficoltà.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
       },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
+      },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/icon-192.png" },
     ],
+
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
