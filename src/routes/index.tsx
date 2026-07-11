@@ -15,6 +15,11 @@ import {
   ArrowUpDown,
   StickyNote,
   MapPin,
+  Navigation,
+  Maximize2,
+  Minimize2,
+  LocateFixed,
+  LocateOff,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
