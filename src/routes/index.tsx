@@ -20,6 +20,8 @@ import {
   Minimize2,
   LocateFixed,
   LocateOff,
+  Menu,
+  X,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
