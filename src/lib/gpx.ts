@@ -266,6 +266,46 @@ export function computeStats(track: GpxTrack): TrackStats {
   };
 }
 
+// Distance (meters) from a point to the closest segment of a track polyline.
+function pointToSegment(
+  p: { lat: number; lon: number },
+  a: GpxPoint,
+  b: GpxPoint,
+): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const lat0 = toRad(p.lat);
+  const projX = (lon: number) => toRad(lon) * Math.cos(lat0) * R;
+  const projY = (lat: number) => toRad(lat) * R;
+  const px = projX(p.lon);
+  const py = projY(p.lat);
+  const ax = projX(a.lon);
+  const ay = projY(a.lat);
+  const bx = projX(b.lon);
+  const by = projY(b.lat);
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len2 = dx * dx + dy * dy;
+  let t = len2 > 0 ? ((px - ax) * dx + (py - ay) * dy) / len2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  const cx = ax + t * dx;
+  const cy = ay + t * dy;
+  return Math.hypot(px - cx, py - cy);
+}
+
+export function distanceToTrack(
+  pt: { lat: number; lon: number },
+  points: GpxPoint[],
+): number {
+  if (points.length === 0) return Infinity;
+  if (points.length === 1) return haversine(pt as GpxPoint, points[0]);
+  let min = Infinity;
+  for (let i = 1; i < points.length; i++) {
+    const d = pointToSegment(pt, points[i - 1], points[i]);
+    if (d < min) min = d;
+  }
+  return min;
+}
+
 export function bboxOf(points: GpxPoint[]): [[number, number], [number, number]] | null {
   if (!points.length) return null;
   let minLat = points[0].lat, maxLat = points[0].lat, minLon = points[0].lon, maxLon = points[0].lon;

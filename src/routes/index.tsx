@@ -22,11 +22,13 @@ import {
   LocateOff,
   Menu,
   X,
+  Bell,
+  AlertTriangle,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
-import { computeStats, parseGpx, type GpxTrack, type ProfilePoint } from "@/lib/gpx";
+import { computeStats, distanceToTrack, parseGpx, type GpxTrack, type ProfilePoint } from "@/lib/gpx";
 import { deleteTrack, listTracks, saveTrack } from "@/lib/storage";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
@@ -63,8 +65,46 @@ function HomePage() {
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [offRouteMeters, setOffRouteMeters] = useState(20);
+  const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
+  const [offRoute, setOffRoute] = useState(false);
+  const [offRouteDistance, setOffRouteDistance] = useState<number | null>(null);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const lastBeepRef = useRef(0);
+
+  const ensureAudio = useCallback(() => {
+    try {
+      if (!audioCtxRef.current) {
+        const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AC();
+      }
+      if (audioCtxRef.current.state === "suspended") void audioCtxRef.current.resume();
+    } catch {
+      // audio not available
+    }
+  }, []);
+
+  const playAlarm = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    if (ctx.state === "suspended") void ctx.resume();
+    // Two short beeps
+    [0, 0.35].forEach((offset) => {
+      const t = ctx.currentTime + offset;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.5, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.3);
+    });
+  }, []);
 
   const stopGeo = useCallback(() => {
     if (geoWatchRef.current !== null && "geolocation" in navigator) {
@@ -73,6 +113,8 @@ function HomePage() {
     geoWatchRef.current = null;
     setFollowUser(false);
     setUserPos(null);
+    setOffRoute(false);
+    setOffRouteDistance(null);
   }, []);
 
   const startGeo = useCallback(() => {
@@ -80,6 +122,7 @@ function HomePage() {
       toast.error("Geolocalizzazione non disponibile su questo dispositivo");
       return;
     }
+    ensureAudio();
     setFollowUser(true);
     const id = navigator.geolocation.watchPosition(
       (pos) => {
@@ -96,7 +139,7 @@ function HomePage() {
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
     );
     geoWatchRef.current = id;
-  }, []);
+  }, [ensureAudio]);
 
   useEffect(() => {
     return () => {
@@ -185,6 +228,30 @@ function HomePage() {
 
   const selected = tracks.find((t) => t.id === selectedId) ?? null;
   const stats = useMemo(() => (selected ? computeStats(selected) : null), [selected]);
+
+  // Off-route detection: alert when the user strays too far from the selected track
+  useEffect(() => {
+    if (!userPos || !selected || selected.points.length === 0) {
+      setOffRoute(false);
+      setOffRouteDistance(null);
+      return;
+    }
+    const d = distanceToTrack(userPos, selected.points);
+    setOffRouteDistance(d);
+    const isOff = d > offRouteMeters;
+    setOffRoute(isOff);
+    if (isOff && offRouteAlertEnabled) {
+      const now = Date.now();
+      if (now - lastBeepRef.current > 5000) {
+        lastBeepRef.current = now;
+        playAlarm();
+        toast.warning(`Fuori percorso: ${Math.round(d)} m dalla traccia`, { id: "off-route" });
+      }
+    } else {
+      // reset the throttle so the next departure alerts immediately
+      lastBeepRef.current = 0;
+    }
+  }, [userPos, selected, offRouteMeters, offRouteAlertEnabled, playAlarm]);
 
   const filteredSorted = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -304,6 +371,61 @@ function HomePage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="border-b border-border p-3">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Bell className="h-3.5 w-3.5" /> Allarme fuori percorso
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={offRouteAlertEnabled}
+                onClick={() => setOffRouteAlertEnabled((v) => !v)}
+                className={cn(
+                  "relative h-5 w-9 shrink-0 rounded-full transition",
+                  offRouteAlertEnabled ? "bg-primary" : "bg-muted",
+                )}
+                title={offRouteAlertEnabled ? "Disattiva allarme" : "Attiva allarme"}
+              >
+                <span
+                  className={cn(
+                    "absolute top-0.5 h-4 w-4 rounded-full bg-background transition-all",
+                    offRouteAlertEnabled ? "left-[18px]" : "left-0.5",
+                  )}
+                />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={5}
+                max={200}
+                step={5}
+                value={offRouteMeters}
+                onChange={(e) => setOffRouteMeters(Number(e.target.value))}
+                className="flex-1 accent-primary"
+                aria-label="Distanza soglia fuori percorso"
+              />
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min={1}
+                  max={1000}
+                  value={offRouteMeters}
+                  onChange={(e) =>
+                    setOffRouteMeters(Math.max(1, Math.min(1000, Number(e.target.value) || 0)))
+                  }
+                  className="w-16 rounded-lg border border-input bg-background px-2 py-1 text-sm tabular-nums"
+                />
+                <span className="text-xs text-muted-foreground">m</span>
+              </div>
+            </div>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">
+              Suona quando ti allontani oltre {offRouteMeters} m dalla traccia selezionata mentre la
+              posizione è attiva.
+            </p>
           </div>
 
           <div className="border-b border-border p-3">
@@ -484,6 +606,13 @@ function HomePage() {
                 </span>
               )}
             </div>
+            {/* Off-route banner */}
+            {offRoute && offRouteDistance !== null && (
+              <div className="pointer-events-none absolute left-1/2 top-3 z-[600] flex -translate-x-1/2 items-center gap-2 rounded-lg border border-destructive bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground shadow-lg">
+                <AlertTriangle className="h-4 w-4" />
+                Fuori percorso · {Math.round(offRouteDistance)} m
+              </div>
+            )}
           </div>
 
 
