@@ -35,14 +35,17 @@ interface Props {
   layer: LayerKey;
   hoverPoint: ProfilePoint | null;
   onCursorMove?: (lat: number, lon: number) => void;
+  userPosition?: { lat: number; lon: number; accuracy?: number } | null;
+  followUser?: boolean;
 }
 
-export function MapView({ tracks, layer, hoverPoint, onCursorMove }: Props) {
+export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition, followUser }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const tileRef = useRef<L.TileLayer | null>(null);
   const trackLayersRef = useRef<Map<string, L.LayerGroup>>(new Map());
   const cursorMarkerRef = useRef<L.CircleMarker | null>(null);
+  const userMarkerRef = useRef<L.LayerGroup | null>(null);
   const lastBoundsSigRef = useRef<string>("");
 
   // init map
@@ -65,7 +68,13 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove }: Props) {
       onCursorMove?.(e.latlng.lat, e.latlng.lng);
     });
 
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    ro.observe(containerRef.current);
+
     return () => {
+      ro.disconnect();
       map.remove();
       mapRef.current = null;
     };
@@ -106,10 +115,21 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove }: Props) {
       if (existing.has(t.id)) continue;
       const group = L.layerGroup();
       const latlngs = t.points.map((p) => [p.lat, p.lon] as [number, number]);
+      // white halo for contrast
+      L.polyline(latlngs, {
+        color: "#ffffff",
+        weight: 8,
+        opacity: 0.85,
+        lineJoin: "round",
+        lineCap: "round",
+      }).addTo(group);
+      // main track (blue, more visible)
       L.polyline(latlngs, {
         color: t.color,
-        weight: 4,
-        opacity: 0.9,
+        weight: 5,
+        opacity: 1,
+        lineJoin: "round",
+        lineCap: "round",
       }).addTo(group);
       // start/end markers
       if (latlngs.length > 0) {
@@ -162,6 +182,42 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove }: Props) {
       }).addTo(map);
     }
   }, [hoverPoint]);
+
+  // user position (blue dot with accuracy circle)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (userMarkerRef.current) {
+      map.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    if (userPosition) {
+      const g = L.layerGroup();
+      if (userPosition.accuracy && userPosition.accuracy > 0) {
+        L.circle([userPosition.lat, userPosition.lon], {
+          radius: userPosition.accuracy,
+          color: "#2563eb",
+          weight: 1,
+          fillColor: "#3b82f6",
+          fillOpacity: 0.15,
+        }).addTo(g);
+      }
+      L.circleMarker([userPosition.lat, userPosition.lon], {
+        radius: 8,
+        color: "#ffffff",
+        weight: 3,
+        fillColor: "#2563eb",
+        fillOpacity: 1,
+      })
+        .bindTooltip("La mia posizione")
+        .addTo(g);
+      g.addTo(map);
+      userMarkerRef.current = g;
+      if (followUser) {
+        map.setView([userPosition.lat, userPosition.lon], Math.max(map.getZoom(), 15));
+      }
+    }
+  }, [userPosition, followUser]);
 
   return <div ref={containerRef} className="h-full w-full" style={{ minHeight: 300 }} />;
 }

@@ -15,6 +15,11 @@ import {
   ArrowUpDown,
   StickyNote,
   MapPin,
+  Navigation,
+  Maximize2,
+  Minimize2,
+  LocateFixed,
+  LocateOff,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
@@ -38,7 +43,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const PALETTE = ["#16a34a", "#0284c7", "#d97706", "#9333ea", "#dc2626", "#059669", "#db2777"];
+const PALETTE = ["#2563eb", "#0284c7", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#db2777"];
 
 type SortKey = "date" | "distance" | "ascent" | "duration";
 
@@ -52,7 +57,51 @@ function HomePage() {
   const [dragOver, setDragOver] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
+  const [followUser, setFollowUser] = useState(false);
+  const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const stopGeo = useCallback(() => {
+    if (geoWatchRef.current !== null && "geolocation" in navigator) {
+      navigator.geolocation.clearWatch(geoWatchRef.current);
+    }
+    geoWatchRef.current = null;
+    setFollowUser(false);
+    setUserPos(null);
+  }, []);
+
+  const startGeo = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      toast.error("Geolocalizzazione non disponibile su questo dispositivo");
+      return;
+    }
+    setFollowUser(true);
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        setUserPos({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        });
+      },
+      (err) => {
+        toast.error(`Posizione non disponibile: ${err.message}`);
+        setFollowUser(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
+    );
+    geoWatchRef.current = id;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (geoWatchRef.current !== null && "geolocation" in navigator) {
+        navigator.geolocation.clearWatch(geoWatchRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     listTracks().then((all) => {
@@ -330,13 +379,63 @@ function HomePage() {
 
         {/* Map + panel */}
         <main className="grid min-h-0 grid-rows-[1fr_auto]">
-          <div className="relative min-h-0">
+          <div
+            className={cn(
+              "relative min-h-0",
+              mapFullscreen && "fixed inset-0 z-[1000] bg-background",
+            )}
+          >
             <MapView
               tracks={tracks}
               layer={layer}
               hoverPoint={hoverPoint}
               onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
+              userPosition={userPos}
+              followUser={followUser}
             />
+            {/* Map controls */}
+            <div className="absolute left-3 top-3 z-[500] flex flex-col gap-2">
+              <button
+                onClick={() => (userPos ? stopGeo() : startGeo())}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                  userPos && "border-primary text-primary",
+                )}
+                title={userPos ? "Interrompi tracciamento posizione" : "Mostra la mia posizione"}
+              >
+                {userPos ? <LocateFixed className="h-4 w-4" /> : <LocateOff className="h-4 w-4" />}
+                <span className="hidden sm:inline">
+                  {userPos ? "La mia posizione" : "Posizione"}
+                </span>
+              </button>
+              {userPos && (
+                <button
+                  onClick={() => setFollowUser((v) => !v)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                    followUser && "border-primary text-primary",
+                  )}
+                  title={followUser ? "Smetti di seguire" : "Segui posizione"}
+                >
+                  <Navigation className="h-4 w-4" />
+                  <span className="hidden sm:inline">Segui</span>
+                </button>
+              )}
+              <button
+                onClick={() => setMapFullscreen((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted"
+                title={mapFullscreen ? "Riduci mappa" : "Mappa a tutto schermo"}
+              >
+                {mapFullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {mapFullscreen ? "Riduci" : "Schermo intero"}
+                </span>
+              </button>
+            </div>
             {/* Cursor info overlay */}
             <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-lg border border-border bg-card/95 px-3 py-1.5 text-xs shadow backdrop-blur">
               {cursorLatLng ? (
@@ -353,6 +452,8 @@ function HomePage() {
               )}
             </div>
           </div>
+
+
 
           {/* Bottom panel: elevation + stats */}
           <section className="grid max-h-[55vh] grid-cols-1 gap-3 overflow-y-auto border-t border-border bg-background p-3 lg:grid-cols-[minmax(0,1fr)_360px]">
