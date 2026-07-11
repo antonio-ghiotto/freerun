@@ -57,7 +57,51 @@ function HomePage() {
   const [dragOver, setDragOver] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
+  const [followUser, setFollowUser] = useState(false);
+  const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const stopGeo = useCallback(() => {
+    if (geoWatchRef.current !== null && "geolocation" in navigator) {
+      navigator.geolocation.clearWatch(geoWatchRef.current);
+    }
+    geoWatchRef.current = null;
+    setFollowUser(false);
+    setUserPos(null);
+  }, []);
+
+  const startGeo = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      toast.error("Geolocalizzazione non disponibile su questo dispositivo");
+      return;
+    }
+    setFollowUser(true);
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        setUserPos({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        });
+      },
+      (err) => {
+        toast.error(`Posizione non disponibile: ${err.message}`);
+        setFollowUser(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
+    );
+    geoWatchRef.current = id;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (geoWatchRef.current !== null && "geolocation" in navigator) {
+        navigator.geolocation.clearWatch(geoWatchRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     listTracks().then((all) => {
