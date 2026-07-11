@@ -62,6 +62,7 @@ function HomePage() {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
