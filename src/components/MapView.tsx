@@ -142,11 +142,27 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
       }
       // waypoints
       for (const w of t.waypoints) {
-        L.marker([w.lat, w.lon])
-          .bindPopup(
-            `<strong>${w.name ?? "Waypoint"}</strong>${w.sym ? `<br/><em>${w.sym}</em>` : ""}${w.ele ? `<br/>Quota: ${Math.round(w.ele)} m` : ""}${w.desc ? `<br/>${w.desc}` : ""}`,
-          )
-          .addTo(group);
+        const container = document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = w.name ?? "Waypoint";
+        container.appendChild(title);
+        if (w.sym) {
+          container.appendChild(document.createElement("br"));
+          const em = document.createElement("em");
+          em.textContent = w.sym;
+          container.appendChild(em);
+        }
+        if (w.ele) {
+          container.appendChild(document.createElement("br"));
+          container.appendChild(
+            document.createTextNode(`Quota: ${Math.round(w.ele)} m`),
+          );
+        }
+        if (w.desc) {
+          container.appendChild(document.createElement("br"));
+          container.appendChild(document.createTextNode(w.desc));
+        }
+        L.marker([w.lat, w.lon]).bindPopup(container).addTo(group);
       }
       group.addTo(map);
       existing.set(t.id, group);
