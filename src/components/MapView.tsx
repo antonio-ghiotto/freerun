@@ -35,6 +35,8 @@ interface Props {
   layer: LayerKey;
   hoverPoint: ProfilePoint | null;
   onCursorMove?: (lat: number, lon: number) => void;
+  userPosition?: { lat: number; lon: number; accuracy?: number } | null;
+  followUser?: boolean;
 }
 
 export function MapView({ tracks, layer, hoverPoint, onCursorMove }: Props) {
