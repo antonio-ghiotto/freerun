@@ -24,6 +24,7 @@ import {
   X,
   Bell,
   AlertTriangle,
+  Smartphone,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
@@ -69,10 +70,12 @@ function HomePage() {
   const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
   const [offRoute, setOffRoute] = useState(false);
   const [offRouteDistance, setOffRouteDistance] = useState<number | null>(null);
+  const [keepAwake, setKeepAwake] = useState(true);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const lastBeepRef = useRef(0);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
   const ensureAudio = useCallback(() => {
     try {
@@ -106,6 +109,25 @@ function HomePage() {
     });
   }, []);
 
+  const releaseWakeLock = useCallback(() => {
+    const wl = wakeLockRef.current;
+    wakeLockRef.current = null;
+    if (wl) void wl.release().catch(() => {});
+  }, []);
+
+  const requestWakeLock = useCallback(async () => {
+    if (!("wakeLock" in navigator)) return;
+    try {
+      const wl = await navigator.wakeLock.request("screen");
+      wakeLockRef.current = wl;
+      wl.addEventListener("release", () => {
+        if (wakeLockRef.current === wl) wakeLockRef.current = null;
+      });
+    } catch {
+      // wake lock refused (e.g. tab not visible or low battery)
+    }
+  }, []);
+
   const stopGeo = useCallback(() => {
     if (geoWatchRef.current !== null && "geolocation" in navigator) {
       navigator.geolocation.clearWatch(geoWatchRef.current);
@@ -115,7 +137,8 @@ function HomePage() {
     setUserPos(null);
     setOffRoute(false);
     setOffRouteDistance(null);
-  }, []);
+    releaseWakeLock();
+  }, [releaseWakeLock]);
 
   const startGeo = useCallback(() => {
     if (!("geolocation" in navigator)) {
@@ -123,6 +146,7 @@ function HomePage() {
       return;
     }
     ensureAudio();
+    if (keepAwake) void requestWakeLock();
     setFollowUser(true);
     const id = navigator.geolocation.watchPosition(
       (pos) => {
@@ -139,15 +163,39 @@ function HomePage() {
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
     );
     geoWatchRef.current = id;
-  }, [ensureAudio]);
+  }, [ensureAudio, keepAwake, requestWakeLock]);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      // Browsers auto-release the wake lock when the page is hidden; re-acquire on return.
+      if (
+        document.visibilityState === "visible" &&
+        keepAwake &&
+        geoWatchRef.current !== null &&
+        !wakeLockRef.current
+      ) {
+        void requestWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [keepAwake, requestWakeLock]);
+
+  // Toggle wake lock live while tracking is active
+  useEffect(() => {
+    if (geoWatchRef.current === null) return;
+    if (keepAwake && !wakeLockRef.current) void requestWakeLock();
+    if (!keepAwake && wakeLockRef.current) releaseWakeLock();
+  }, [keepAwake, requestWakeLock, releaseWakeLock]);
 
   useEffect(() => {
     return () => {
       if (geoWatchRef.current !== null && "geolocation" in navigator) {
         navigator.geolocation.clearWatch(geoWatchRef.current);
       }
+      releaseWakeLock();
     };
-  }, []);
+  }, [releaseWakeLock]);
 
   useEffect(() => {
     listTracks().then((all) => {
@@ -425,6 +473,37 @@ function HomePage() {
             <p className="mt-1.5 text-[11px] text-muted-foreground">
               Suona quando ti allontani oltre {offRouteMeters} m dalla traccia selezionata mentre la
               posizione è attiva.
+            </p>
+          </div>
+
+          <div className="border-b border-border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Smartphone className="h-3.5 w-3.5" /> Mantieni schermo acceso
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={keepAwake}
+                onClick={() => setKeepAwake((v) => !v)}
+                className={cn(
+                  "relative h-5 w-9 shrink-0 rounded-full transition",
+                  keepAwake ? "bg-primary" : "bg-muted",
+                )}
+                title={keepAwake ? "Disattiva" : "Attiva"}
+              >
+                <span
+                  className={cn(
+                    "absolute top-0.5 h-4 w-4 rounded-full bg-background transition-all",
+                    keepAwake ? "left-[18px]" : "left-0.5",
+                  )}
+                />
+              </button>
+            </div>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">
+              Impedisce il blocco dello schermo mentre segui la posizione, così l&apos;allarme
+              continua a funzionare. Nota: con lo schermo del tutto spento o l&apos;app in background
+              il browser sospende il tracciamento.
             </p>
           </div>
 
