@@ -109,10 +109,21 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
       if (existing.has(t.id)) continue;
       const group = L.layerGroup();
       const latlngs = t.points.map((p) => [p.lat, p.lon] as [number, number]);
+      // white halo for contrast
+      L.polyline(latlngs, {
+        color: "#ffffff",
+        weight: 8,
+        opacity: 0.85,
+        lineJoin: "round",
+        lineCap: "round",
+      }).addTo(group);
+      // main track (blue, more visible)
       L.polyline(latlngs, {
         color: t.color,
-        weight: 4,
-        opacity: 0.9,
+        weight: 5,
+        opacity: 1,
+        lineJoin: "round",
+        lineCap: "round",
       }).addTo(group);
       // start/end markers
       if (latlngs.length > 0) {
