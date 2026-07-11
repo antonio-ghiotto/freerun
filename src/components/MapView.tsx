@@ -68,7 +68,13 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
       onCursorMove?.(e.latlng.lat, e.latlng.lng);
     });
 
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    ro.observe(containerRef.current);
+
     return () => {
+      ro.disconnect();
       map.remove();
       mapRef.current = null;
     };
