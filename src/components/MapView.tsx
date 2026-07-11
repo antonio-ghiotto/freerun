@@ -177,6 +177,42 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
     }
   }, [hoverPoint]);
 
+  // user position (blue dot with accuracy circle)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (userMarkerRef.current) {
+      map.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    if (userPosition) {
+      const g = L.layerGroup();
+      if (userPosition.accuracy && userPosition.accuracy > 0) {
+        L.circle([userPosition.lat, userPosition.lon], {
+          radius: userPosition.accuracy,
+          color: "#2563eb",
+          weight: 1,
+          fillColor: "#3b82f6",
+          fillOpacity: 0.15,
+        }).addTo(g);
+      }
+      L.circleMarker([userPosition.lat, userPosition.lon], {
+        radius: 8,
+        color: "#ffffff",
+        weight: 3,
+        fillColor: "#2563eb",
+        fillOpacity: 1,
+      })
+        .bindTooltip("La mia posizione")
+        .addTo(g);
+      g.addTo(map);
+      userMarkerRef.current = g;
+      if (followUser) {
+        map.setView([userPosition.lat, userPosition.lon], Math.max(map.getZoom(), 15));
+      }
+    }
+  }, [userPosition, followUser]);
+
   return <div ref={containerRef} className="h-full w-full" style={{ minHeight: 300 }} />;
 }
 
