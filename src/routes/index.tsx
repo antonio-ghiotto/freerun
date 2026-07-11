@@ -288,7 +288,7 @@ function HomePage() {
               <X className="h-4 w-4" />
             </button>
           </div>
-        <aside className="flex min-h-0 flex-col border-b border-border bg-card lg:border-b-0 lg:border-r">
+        
           <div className="border-b border-border p-3">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Layer cartografico
