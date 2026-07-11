@@ -43,7 +43,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const PALETTE = ["#16a34a", "#0284c7", "#d97706", "#9333ea", "#dc2626", "#059669", "#db2777"];
+const PALETTE = ["#2563eb", "#0284c7", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#db2777"];
 
 type SortKey = "date" | "distance" | "ascent" | "duration";
 
