@@ -1,6 +1,6 @@
 {
-  "name": "SentieroLab — Analisi GPX",
-  "short_name": "SentieroLab",
+  "name": "FreeRun — Analisi GPX",
+  "short_name": "FreeRun",
   "description": "PWA offline per l'analisi di tracce GPX escursionistiche.",
   "start_url": "/",
   "scope": "/",

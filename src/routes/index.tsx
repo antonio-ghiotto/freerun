@@ -20,6 +20,8 @@ import {
   Minimize2,
   LocateFixed,
   LocateOff,
+  Menu,
+  X,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
@@ -60,6 +62,7 @@ function HomePage() {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -222,11 +225,19 @@ function HomePage() {
       {/* Header */}
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 sm:flex sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-border bg-background text-foreground transition hover:bg-muted"
+            title="Apri menu"
+            aria-label="Apri menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
             <Mountain className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate font-display text-lg font-bold sm:text-xl">SentieroLab</h1>
+            <h1 className="truncate font-display text-lg font-bold sm:text-xl">FreeRun</h1>
             <p className="truncate text-xs text-muted-foreground">
               Analisi GPX · Offline · Open Source
             </p>
@@ -253,9 +264,31 @@ function HomePage() {
       </header>
 
       {/* Body */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[340px_1fr]">
-        {/* Sidebar */}
-        <aside className="flex min-h-0 flex-col border-b border-border bg-card lg:border-b-0 lg:border-r">
+      <div className="relative grid min-h-0 flex-1 grid-cols-1">
+        {/* Sidebar drawer */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-[1100] bg-black/40"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-[1101] flex w-[85vw] max-w-[360px] min-h-0 flex-col border-r border-border bg-card transition-transform duration-200",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <div className="text-sm font-semibold">Menu</div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="rounded p-1.5 text-muted-foreground hover:text-foreground"
+              aria-label="Chiudi menu"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        
           <div className="border-b border-border p-3">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Layer cartografico

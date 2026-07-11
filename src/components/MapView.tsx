@@ -54,8 +54,9 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
     const map = L.map(containerRef.current, {
       center: [45.9, 10.5],
       zoom: 6,
-      zoomControl: true,
+      zoomControl: false,
     });
+    L.control.zoom({ position: "bottomleft" }).addTo(map);
     mapRef.current = map;
     const l = LAYERS[layer];
     tileRef.current = L.tileLayer(l.url, {
