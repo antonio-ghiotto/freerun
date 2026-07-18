@@ -535,11 +535,13 @@ function HomePage() {
                 type="button"
                 role="switch"
                 aria-checked={keepAwake}
+                aria-label="Mantieni schermo acceso"
                 onClick={() => setKeepAwake((v) => !v)}
                 className={cn(
                   "relative h-5 w-9 shrink-0 rounded-full transition",
                   keepAwake ? "bg-primary" : "bg-muted",
                 )}
+
                 title={keepAwake ? "Disattiva" : "Attiva"}
               >
                 <span
