@@ -156,13 +156,28 @@ export function TrackSearchDialog({
   };
 
   const handleNearby = async () => {
-    if (!userLocation) {
-      toast.error("Attiva la posizione dalla mappa per usare 'Vicino a me'");
-      return;
+    let loc = userLocation ?? null;
+    if (!loc) {
+      if (!("geolocation" in navigator)) {
+        toast.error("Geolocalizzazione non supportata dal browser");
+        return;
+      }
+      try {
+        loc = await new Promise<{ lat: number; lon: number }>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+            (err) => reject(err),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+          );
+        });
+      } catch {
+        toast.error("Impossibile ottenere la posizione. Concedi il permesso e riprova.");
+        return;
+      }
     }
-    setSelectedLocation({ displayName: "La mia posizione", ...userLocation });
+    setSelectedLocation({ displayName: "La mia posizione", ...loc });
     setQuery("La mia posizione");
-    await runSearch(userLocation, "nearby");
+    await runSearch(loc, "nearby");
   };
 
   const filteredSorted = useMemo(() => {
