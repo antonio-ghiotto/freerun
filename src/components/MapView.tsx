@@ -241,9 +241,5 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
   return <div ref={containerRef} className="h-full w-full" style={{ minHeight: 300 }} />;
 }
 
-export const LAYER_LABELS: Record<LayerKey, string> = {
-  osm: "OpenStreetMap",
-  otm: "OpenTopoMap",
-  cyclosm: "CyclOSM (escursionistica)",
-  sat: "Satellite (Esri)",
-};
+export { LAYER_LABELS } from "./mapLayers";
+
