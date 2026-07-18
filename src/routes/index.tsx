@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
 import {
   Upload,
@@ -28,7 +29,8 @@ import {
   Settings,
   ChevronDown,
 } from "lucide-react";
-import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
+import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
+const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
 import { computeStats, distanceToTrack, parseGpx, type GpxTrack, type ProfilePoint } from "@/lib/gpx";
@@ -660,14 +662,18 @@ function HomePage() {
               mapFullscreen && "fixed inset-0 z-[1000] bg-background",
             )}
           >
-            <MapView
-              tracks={tracks}
-              layer={layer}
-              hoverPoint={hoverPoint}
-              onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
-              userPosition={userPos}
-              followUser={followUser}
-            />
+            <ClientOnly fallback={<div className="h-full w-full bg-muted" />}>
+              <Suspense fallback={<div className="h-full w-full bg-muted" />}>
+                <MapView
+                  tracks={tracks}
+                  layer={layer}
+                  hoverPoint={hoverPoint}
+                  onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
+                  userPosition={userPos}
+                  followUser={followUser}
+                />
+              </Suspense>
+            </ClientOnly>
             {/* Map controls */}
             <div className="absolute left-3 top-3 z-[500] flex flex-col gap-2">
               <button
