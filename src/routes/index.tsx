@@ -29,7 +29,8 @@ import {
   Settings,
   ChevronDown,
 } from "lucide-react";
-import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
+import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
+const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
 import { computeStats, distanceToTrack, parseGpx, type GpxTrack, type ProfilePoint } from "@/lib/gpx";
