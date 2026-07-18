@@ -43,16 +43,15 @@ import { AppRating } from "@/components/AppRating";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FreeRun" },
-      {
-        name: "description",
-        content:
-          "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline.",
-      },
+      { property: "og:url", content: "https://freerun.lovable.app/" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
     ],
+    links: [{ rel: "canonical", href: "https://freerun.lovable.app/" }],
   }),
   component: HomePage,
 });
+
 
 const PALETTE = ["#2563eb", "#0284c7", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#db2777"];
 
