@@ -779,7 +779,10 @@ function HomePage() {
                 )}
               </div>
             </div>
-            <div>
+            <div className="rounded-xl border border-border bg-card p-2">
+              <h2 className="mb-1 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Statistiche
+              </h2>
               {stats ? (
                 <StatsPanel stats={stats} />
               ) : (
@@ -788,6 +791,7 @@ function HomePage() {
                 </div>
               )}
             </div>
+
           </section>
         </main>
       </div>
