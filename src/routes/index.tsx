@@ -662,14 +662,18 @@ function HomePage() {
               mapFullscreen && "fixed inset-0 z-[1000] bg-background",
             )}
           >
-            <MapView
-              tracks={tracks}
-              layer={layer}
-              hoverPoint={hoverPoint}
-              onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
-              userPosition={userPos}
-              followUser={followUser}
-            />
+            <ClientOnly fallback={<div className="h-full w-full bg-muted" />}>
+              <Suspense fallback={<div className="h-full w-full bg-muted" />}>
+                <MapView
+                  tracks={tracks}
+                  layer={layer}
+                  hoverPoint={hoverPoint}
+                  onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
+                  userPosition={userPos}
+                  followUser={followUser}
+                />
+              </Suspense>
+            </ClientOnly>
             {/* Map controls */}
             <div className="absolute left-3 top-3 z-[500] flex flex-col gap-2">
               <button
