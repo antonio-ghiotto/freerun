@@ -70,6 +70,7 @@ function HomePage() {
   const [followUser, setFollowUser] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [offRouteMeters, setOffRouteMeters] = useState(20);
   const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
   const [offRoute, setOffRoute] = useState(false);
