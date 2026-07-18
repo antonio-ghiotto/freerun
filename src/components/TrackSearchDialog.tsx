@@ -336,9 +336,9 @@ export function TrackSearchDialog({
             </button>
             <button
               onClick={handleNearby}
-              disabled={searching || !userLocation}
+              disabled={searching}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm hover:bg-muted disabled:opacity-60"
-              title={userLocation ? "Cerca vicino a me" : "Attiva la posizione per usarlo"}
+              title="Cerca vicino a me (richiede permesso posizione)"
             >
               <Locate className="h-4 w-4" /> Vicino a me
             </button>
