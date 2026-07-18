@@ -78,15 +78,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FreeRun" },
+      { title: "FreeRun — Analisi GPX e Mappe Offline" },
       {
         name: "description",
         content:
           "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline.",
       },
-      { name: "author", content: "SentieroLab" },
+      { name: "author", content: "FreeRun" },
       { name: "theme-color", content: "#1f6b3a" },
-      { property: "og:title", content: "FreeRun" },
+      { property: "og:site_name", content: "FreeRun" },
+      { property: "og:title", content: "FreeRun — Analisi GPX e Mappe Offline" },
       {
         property: "og:description",
         content:
@@ -94,10 +95,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "FreeRun" },
+      { name: "twitter:title", content: "FreeRun — Analisi GPX e Mappe Offline" },
       { name: "twitter:description", content: "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
+
     ],
     links: [
       { rel: "stylesheet", href: appCss },
