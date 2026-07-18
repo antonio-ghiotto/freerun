@@ -57,14 +57,26 @@ interface OverpassElement {
 }
 
 async function overpass<T>(query: string, signal?: AbortSignal): Promise<T> {
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    body: "data=" + encodeURIComponent(query),
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    signal,
-  });
-  if (!res.ok) throw new Error(`Overpass ${res.status}`);
-  return (await res.json()) as T;
+  let lastErr: unknown;
+  for (const endpoint of ENDPOINTS) {
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: "data=" + encodeURIComponent(query),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        signal,
+      });
+      if (!res.ok) {
+        lastErr = new Error(`Overpass ${res.status}`);
+        continue;
+      }
+      return (await res.json()) as T;
+    } catch (e) {
+      if (signal?.aborted) throw e;
+      lastErr = e;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Overpass non raggiungibile");
 }
 
 function toActivity(tags?: Record<string, string>): Activity {
