@@ -38,6 +38,7 @@ import { deleteTrack, listTracks, saveTrack } from "@/lib/storage";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { TrackSearchDialog } from "@/components/TrackSearchDialog";
+import { AppRating } from "@/components/AppRating";
 
 export const Route = createFileRoute("/")({
   head: () => ({
