@@ -1,4 +1,7 @@
-User-agent: *
+User-agent: Googlebot
 Allow: /
+
+User-agent: *
+Disallow: /
 
 Sitemap: https://freerun.lovable.app/sitemap.xml
