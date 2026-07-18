@@ -627,6 +627,7 @@ function HomePage() {
                     onClick={() => toggleVisible(t.id)}
                     className="rounded p-1 text-muted-foreground hover:text-foreground"
                     title={t.visible ? "Nascondi" : "Mostra"}
+                    aria-label={t.visible ? `Nascondi traccia ${t.name}` : `Mostra traccia ${t.name}`}
                   >
                     {t.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -636,9 +637,11 @@ function HomePage() {
                     }}
                     className="rounded p-1 text-muted-foreground hover:text-destructive"
                     title="Elimina"
+                    aria-label={`Elimina traccia ${t.name}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
+
                 </div>
                 {selectedId === t.id && (
                   <div className="mt-2 flex items-start gap-1">
