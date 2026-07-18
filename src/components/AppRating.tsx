@@ -20,7 +20,7 @@ export function AppRating() {
     }
   }, []);
 
-  const setValue = (v: number) => {
+  const setValue = async (v: number) => {
     setRating(v);
     try {
       localStorage.setItem(KEY, String(v));
@@ -30,7 +30,17 @@ export function AppRating() {
     toast.success(
       v >= 4 ? "Grazie per il tuo supporto!" : "Grazie per il feedback!",
     );
+    try {
+      await supabase.from("app_ratings").insert({
+        stars: v,
+        user_agent:
+          typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 300) : null,
+      });
+    } catch (err) {
+      console.warn("rating submit failed", err);
+    }
   };
+
 
   const active = hover || rating;
 
