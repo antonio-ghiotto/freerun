@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
 
 const KEY = "freerun:app-rating";
 
