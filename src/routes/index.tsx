@@ -35,6 +35,7 @@ import { computeStats, distanceToTrack, parseGpx, type GpxTrack, type ProfilePoi
 import { deleteTrack, listTracks, saveTrack } from "@/lib/storage";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
+import { TrackSearchDialog } from "@/components/TrackSearchDialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
