@@ -478,12 +478,14 @@ function HomePage() {
                 type="button"
                 role="switch"
                 aria-checked={offRouteAlertEnabled}
+                aria-label="Allarme fuori percorso"
                 onClick={() => setOffRouteAlertEnabled((v) => !v)}
                 className={cn(
                   "relative h-5 w-9 shrink-0 rounded-full transition",
                   offRouteAlertEnabled ? "bg-primary" : "bg-muted",
                 )}
                 title={offRouteAlertEnabled ? "Disattiva allarme" : "Attiva allarme"}
+
               >
                 <span
                   className={cn(
