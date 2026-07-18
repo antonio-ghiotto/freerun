@@ -25,6 +25,7 @@ export interface GpxTrack {
   color: string;
   visible: boolean;
   note?: string;
+  rating?: "up" | "down" | null;
   raw?: string; // original xml for re-export (optional)
 }
 
