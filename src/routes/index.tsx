@@ -805,9 +805,11 @@ function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) =
       onClick={next}
       className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
       title={`Tema: ${label}`}
+      aria-label={`Cambia tema (attuale: ${label})`}
     >
       <Icon className="h-4 w-4" />
       <span className="hidden sm:inline">{label}</span>
     </button>
+
   );
 }
