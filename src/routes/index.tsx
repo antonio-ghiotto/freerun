@@ -28,8 +28,6 @@ import {
   Smartphone,
   Settings,
   ChevronDown,
-  ThumbsUp,
-  ThumbsDown,
 } from "lucide-react";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
@@ -278,15 +276,6 @@ function HomePage() {
 
   const updateNote = async (id: string, note: string) => {
     const next = tracks.map((t) => (t.id === id ? { ...t, note } : t));
-    setTracks(next);
-    const t = next.find((x) => x.id === id);
-    if (t) await saveTrack(t);
-  };
-
-  const setRating = async (id: string, rating: "up" | "down") => {
-    const next = tracks.map((t) =>
-      t.id === id ? { ...t, rating: t.rating === rating ? null : rating } : t,
-    );
     setTracks(next);
     const t = next.find((x) => x.id === id);
     if (t) await saveTrack(t);
@@ -626,28 +615,6 @@ function HomePage() {
                       {(s.distance / 1000).toFixed(1)} km · {Math.round(s.ascent)} m d+ ·{" "}
                       <span className="font-medium">{s.difficulty}</span>
                     </div>
-                  </button>
-                  <button
-                    onClick={() => setRating(t.id, "up")}
-                    className={cn(
-                      "rounded p-1 text-muted-foreground hover:text-emerald-600",
-                      t.rating === "up" && "text-emerald-600",
-                    )}
-                    title="Mi piace"
-                    aria-pressed={t.rating === "up"}
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setRating(t.id, "down")}
-                    className={cn(
-                      "rounded p-1 text-muted-foreground hover:text-red-600",
-                      t.rating === "down" && "text-red-600",
-                    )}
-                    title="Non mi piace"
-                    aria-pressed={t.rating === "down"}
-                  >
-                    <ThumbsDown className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => toggleVisible(t.id)}
