@@ -43,16 +43,15 @@ import { AppRating } from "@/components/AppRating";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FreeRun" },
-      {
-        name: "description",
-        content:
-          "Carica tracce GPX, visualizzale su mappa, ottieni profilo altimetrico, statistiche complete e classificazione di difficoltà. Funziona offline.",
-      },
+      { property: "og:url", content: "https://freerun.lovable.app/" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/40c43b27-f005-4fb9-bf03-6ea13bc8429c" },
     ],
+    links: [{ rel: "canonical", href: "https://freerun.lovable.app/" }],
   }),
   component: HomePage,
 });
+
 
 const PALETTE = ["#2563eb", "#0284c7", "#16a34a", "#d97706", "#9333ea", "#dc2626", "#db2777"];
 
@@ -360,9 +359,12 @@ function HomePage() {
             <Mountain className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate font-display text-lg font-bold sm:text-xl">FreeRun</h1>
+            <h1 className="truncate font-display text-lg font-bold sm:text-xl">
+              FreeRun — Visualizzatore e analizzatore GPX offline
+            </h1>
             <p className="truncate text-xs text-muted-foreground">
               Analisi GPX · Offline · Open Source
+
             </p>
           </div>
         </div>
@@ -476,12 +478,14 @@ function HomePage() {
                 type="button"
                 role="switch"
                 aria-checked={offRouteAlertEnabled}
+                aria-label="Allarme fuori percorso"
                 onClick={() => setOffRouteAlertEnabled((v) => !v)}
                 className={cn(
                   "relative h-5 w-9 shrink-0 rounded-full transition",
                   offRouteAlertEnabled ? "bg-primary" : "bg-muted",
                 )}
                 title={offRouteAlertEnabled ? "Disattiva allarme" : "Attiva allarme"}
+
               >
                 <span
                   className={cn(
@@ -531,11 +535,13 @@ function HomePage() {
                 type="button"
                 role="switch"
                 aria-checked={keepAwake}
+                aria-label="Mantieni schermo acceso"
                 onClick={() => setKeepAwake((v) => !v)}
                 className={cn(
                   "relative h-5 w-9 shrink-0 rounded-full transition",
                   keepAwake ? "bg-primary" : "bg-muted",
                 )}
+
                 title={keepAwake ? "Disattiva" : "Attiva"}
               >
                 <span
@@ -625,6 +631,7 @@ function HomePage() {
                     onClick={() => toggleVisible(t.id)}
                     className="rounded p-1 text-muted-foreground hover:text-foreground"
                     title={t.visible ? "Nascondi" : "Mostra"}
+                    aria-label={t.visible ? `Nascondi traccia ${t.name}` : `Mostra traccia ${t.name}`}
                   >
                     {t.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -634,9 +641,11 @@ function HomePage() {
                     }}
                     className="rounded p-1 text-muted-foreground hover:text-destructive"
                     title="Elimina"
+                    aria-label={`Elimina traccia ${t.name}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
+
                 </div>
                 {selectedId === t.id && (
                   <div className="mt-2 flex items-start gap-1">
@@ -752,9 +761,9 @@ function HomePage() {
           <section className="grid max-h-[55vh] grid-cols-1 gap-3 overflow-y-auto border-t border-border bg-background p-3 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
               <div className="mb-1 flex items-center justify-between px-1">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Profilo altimetrico
-                </div>
+                </h2>
                 {selected && (
                   <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
                 )}
@@ -765,11 +774,15 @@ function HomePage() {
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     Carica una traccia GPX per iniziare
+
                   </div>
                 )}
               </div>
             </div>
-            <div>
+            <div className="rounded-xl border border-border bg-card p-2">
+              <h2 className="mb-1 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Statistiche
+              </h2>
               {stats ? (
                 <StatsPanel stats={stats} />
               ) : (
@@ -778,6 +791,7 @@ function HomePage() {
                 </div>
               )}
             </div>
+
           </section>
         </main>
       </div>
@@ -796,9 +810,11 @@ function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) =
       onClick={next}
       className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
       title={`Tema: ${label}`}
+      aria-label={`Cambia tema (attuale: ${label})`}
     >
       <Icon className="h-4 w-4" />
       <span className="hidden sm:inline">{label}</span>
     </button>
+
   );
 }
