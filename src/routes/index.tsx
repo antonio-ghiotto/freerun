@@ -761,9 +761,9 @@ function HomePage() {
           <section className="grid max-h-[55vh] grid-cols-1 gap-3 overflow-y-auto border-t border-border bg-background p-3 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
               <div className="mb-1 flex items-center justify-between px-1">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Profilo altimetrico
-                </div>
+                </h2>
                 {selected && (
                   <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
                 )}
@@ -774,6 +774,7 @@ function HomePage() {
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     Carica una traccia GPX per iniziare
+
                   </div>
                 )}
               </div>
