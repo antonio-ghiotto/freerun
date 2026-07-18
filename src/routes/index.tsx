@@ -366,6 +366,14 @@ function HomePage() {
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle theme={theme} setTheme={setTheme} />
           <button
+            onClick={() => setSearchOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium transition hover:bg-muted"
+            title="Cerca percorsi online"
+          >
+            <Search className="h-4 w-4" />
+            <span className="hidden sm:inline">Cerca online</span>
+          </button>
+          <button
             onClick={() => fileInputRef.current?.click()}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
           >
@@ -382,6 +390,16 @@ function HomePage() {
           />
         </div>
       </header>
+
+      <TrackSearchDialog
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        userLocation={userPos}
+        onImport={async (xml, filename) => {
+          const file = new File([xml], filename, { type: "application/gpx+xml" });
+          await handleFiles([file]);
+        }}
+      />
 
       {/* Body */}
       <div className="relative grid min-h-0 flex-1 grid-cols-1">
