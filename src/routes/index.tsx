@@ -25,6 +25,8 @@ import {
   Bell,
   AlertTriangle,
   Smartphone,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
 import { MapView, LAYER_LABELS, type LayerKey } from "@/components/MapView";
 import { ElevationChart } from "@/components/ElevationChart";
@@ -66,6 +68,7 @@ function HomePage() {
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [offRouteMeters, setOffRouteMeters] = useState(20);
   const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
   const [offRoute, setOffRoute] = useState(false);
@@ -404,6 +407,22 @@ function HomePage() {
             </button>
           </div>
         
+          <button
+            type="button"
+            onClick={() => setSettingsOpen((v) => !v)}
+            aria-expanded={settingsOpen}
+            className="flex w-full items-center justify-between border-b border-border p-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition hover:text-foreground"
+          >
+            <span className="flex items-center gap-2">
+              <Settings className="h-3.5 w-3.5" /> Impostazioni
+            </span>
+            <ChevronDown
+              className={cn("h-4 w-4 transition-transform", settingsOpen && "rotate-180")}
+            />
+          </button>
+
+          {settingsOpen && (
+          <>
           <div className="border-b border-border p-3">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Layers className="h-3.5 w-3.5" /> Layer cartografico
@@ -506,6 +525,8 @@ function HomePage() {
               il browser sospende il tracciamento.
             </p>
           </div>
+          </>
+          )}
 
           <div className="border-b border-border p-3">
             <div className="mb-2 flex items-center justify-between gap-2">

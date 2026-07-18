@@ -30,6 +30,17 @@ const LAYERS: Record<LayerKey, { url: string; attribution: string; maxZoom: numb
   },
 };
 
+function createTileLayer(key: LayerKey): L.TileLayer {
+  const l = LAYERS[key];
+  return L.tileLayer(l.url, {
+    attribution: l.attribution,
+    maxZoom: l.maxZoom,
+    // Always provide subdomains: Leaflet evaluates {s} for every tile even when
+    // the URL has no {s}, so an undefined value throws and breaks the layer.
+    subdomains: l.subdomains ?? "abc",
+  });
+}
+
 interface Props {
   tracks: GpxTrack[];
   layer: LayerKey;
@@ -58,12 +69,7 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
     });
     L.control.zoom({ position: "bottomleft" }).addTo(map);
     mapRef.current = map;
-    const l = LAYERS[layer];
-    tileRef.current = L.tileLayer(l.url, {
-      attribution: l.attribution,
-      maxZoom: l.maxZoom,
-      subdomains: l.subdomains as any,
-    }).addTo(map);
+    tileRef.current = createTileLayer(layer).addTo(map);
 
     map.on("mousemove", (e) => {
       onCursorMove?.(e.latlng.lat, e.latlng.lng);
@@ -87,12 +93,7 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
     const map = mapRef.current;
     if (!map) return;
     if (tileRef.current) map.removeLayer(tileRef.current);
-    const l = LAYERS[layer];
-    tileRef.current = L.tileLayer(l.url, {
-      attribution: l.attribution,
-      maxZoom: l.maxZoom,
-      subdomains: l.subdomains as any,
-    }).addTo(map);
+    tileRef.current = createTileLayer(layer).addTo(map);
   }, [layer]);
 
   // render tracks
