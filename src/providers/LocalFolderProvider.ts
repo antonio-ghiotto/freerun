@@ -117,8 +117,6 @@ export class LocalFolderProvider implements TrackProvider {
     return this.filter(await this.allResults(params.signal), {
       location: params.center,
       radiusKm: params.radiusKm,
-      activity: params.activity,
-      limit: params.limit,
     });
   }
 
