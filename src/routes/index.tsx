@@ -359,9 +359,12 @@ function HomePage() {
             <Mountain className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate font-display text-lg font-bold sm:text-xl">FreeRun</h1>
+            <h1 className="truncate font-display text-lg font-bold sm:text-xl">
+              FreeRun — Visualizzatore e analizzatore GPX offline
+            </h1>
             <p className="truncate text-xs text-muted-foreground">
               Analisi GPX · Offline · Open Source
+
             </p>
           </div>
         </div>
