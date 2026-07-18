@@ -1,0 +1,9 @@
+# FreeRun
+
+> Visualizzatore e analizzatore di tracce GPX offline: mappe (OSM, OpenTopoMap, satellite), profilo altimetrico, statistiche complete, stima tempi Naismith, difficoltà CAI. Progressive Web App interamente client-side.
+
+FreeRun è una PWA gratuita e open source pensata per escursionisti, trail runner e ciclisti. Carica file GPX, li visualizza su mappa Leaflet, calcola distanza, dislivello, pendenze e tempi di percorrenza, e funziona offline grazie a IndexedDB.
+
+## Pages
+
+- [Home](/): Carica tracce GPX, esplora la mappa, consulta statistiche e profilo altimetrico.
