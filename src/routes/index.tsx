@@ -292,9 +292,11 @@ function HomePage() {
   const selected = tracks.find((t) => t.id === selectedId) ?? null;
   const stats = useMemo(() => (selected ? computeStats(selected) : null), [selected]);
 
-  // Off-route detection: alert when the user strays too far from the selected track
+  // Off-route detection: alert when the user strays too far from the selected track.
+  // Runs only when the user explicitly armed the alarm or follow-me mode.
+  const offRouteWatch = offRouteAlertEnabled || followUser;
   useEffect(() => {
-    if (!userPos || !selected || selected.points.length === 0) {
+    if (!offRouteWatch || !userPos || !selected || selected.points.length === 0) {
       setOffRoute(false);
       setOffRouteDistance(null);
       return;
@@ -314,7 +316,7 @@ function HomePage() {
       // reset the throttle so the next departure alerts immediately
       lastBeepRef.current = 0;
     }
-  }, [userPos, selected, offRouteMeters, offRouteAlertEnabled, playAlarm]);
+  }, [offRouteWatch, userPos, selected, offRouteMeters, offRouteAlertEnabled, playAlarm]);
 
   const filteredSorted = useMemo(() => {
     const q = search.trim().toLowerCase();
