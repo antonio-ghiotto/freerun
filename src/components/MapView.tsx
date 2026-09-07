@@ -6,7 +6,10 @@ import { bboxOf } from "@/lib/gpx";
 import type { LayerKey } from "./mapLayers";
 export type { LayerKey };
 
-const LAYERS: Record<LayerKey, { url: string; attribution: string; maxZoom: number; subdomains?: string }> = {
+const LAYERS: Record<
+  LayerKey,
+  { url: string; attribution: string; maxZoom: number; subdomains?: string; overlay?: string }
+> = {
   osm: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "© OpenStreetMap contributors",
@@ -19,9 +22,11 @@ const LAYERS: Record<LayerKey, { url: string; attribution: string; maxZoom: numb
     subdomains: "abc",
   },
   cyclosm: {
-    url: "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
-    attribution: "© CyclOSM | © OpenStreetMap contributors",
-    maxZoom: 20,
+    // Hiking map: OpenTopoMap base + Waymarked Trails hiking route overlay
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    overlay: "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
+    attribution: "© OpenTopoMap (CC-BY-SA) | Sentieri © waymarkedtrails.org (CC-BY-SA)",
+    maxZoom: 17,
     subdomains: "abc",
   },
   sat: {
@@ -31,16 +36,22 @@ const LAYERS: Record<LayerKey, { url: string; attribution: string; maxZoom: numb
   },
 };
 
-function createTileLayer(key: LayerKey): L.TileLayer {
+function createTileLayer(key: LayerKey): L.LayerGroup {
   const l = LAYERS[key];
-  return L.tileLayer(l.url, {
+  const group = L.layerGroup();
+  L.tileLayer(l.url, {
     attribution: l.attribution,
     maxZoom: l.maxZoom,
     // Always provide subdomains: Leaflet evaluates {s} for every tile even when
     // the URL has no {s}, so an undefined value throws and breaks the layer.
     subdomains: l.subdomains ?? "abc",
-  });
+  }).addTo(group);
+  if (l.overlay) {
+    L.tileLayer(l.overlay, { maxZoom: l.maxZoom, subdomains: "abc", opacity: 0.85 }).addTo(group);
+  }
+  return group;
 }
+
 
 interface Props {
   tracks: GpxTrack[];
