@@ -757,21 +757,19 @@ function HomePage() {
                 </span>
               </button>
             </div>
-            {/* Cursor info overlay */}
-            <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-lg border border-border bg-card/95 px-3 py-1.5 text-xs shadow backdrop-blur">
-              {cursorLatLng ? (
+            {/* Cursor coordinates + hovered elevation */}
+            {cursorLatLng && (
+              <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-lg border border-border bg-card/95 px-3 py-1.5 text-xs shadow backdrop-blur">
                 <span className="tabular-nums">
                   {cursorLatLng.lat.toFixed(5)}, {cursorLatLng.lon.toFixed(5)}
                 </span>
-              ) : (
-                <span className="text-muted-foreground">Muovi il cursore sulla mappa</span>
-              )}
-              {hoverEle !== null && (
-                <span className="ml-2 rounded bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">
-                  {hoverEle} m
-                </span>
-              )}
-            </div>
+                {hoverEle !== null && (
+                  <span className="ml-2 rounded bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">
+                    {hoverEle} m
+                  </span>
+                )}
+              </div>
+            )}
             {/* Off-route banner */}
             {offRoute && offRouteDistance !== null && (
               <div className="pointer-events-none absolute left-1/2 top-3 z-[600] flex -translate-x-1/2 items-center gap-2 rounded-lg border border-destructive bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground shadow-lg">

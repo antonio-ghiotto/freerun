@@ -68,7 +68,7 @@ export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition,
       zoom: 6,
       zoomControl: false,
     });
-    L.control.zoom({ position: "bottomleft" }).addTo(map);
+    L.control.zoom({ position: "bottomright" }).addTo(map);
     mapRef.current = map;
     tileRef.current = createTileLayer(layer).addTo(map);
 
