@@ -30,13 +30,8 @@ import {
   ChevronDown,
   ClipboardList,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
+
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
@@ -88,6 +83,8 @@ function HomePage() {
   const [keepAwake, setKeepAwake] = useState(false);
   const [elevationExpanded, setElevationExpanded] = useState(true);
   const [cursorEnabled, setCursorEnabled] = useState(true);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -222,26 +219,29 @@ function HomePage() {
       if (match) setSelectedId(match.id);
       else if (all.length > 0) setSelectedId(all[0].id);
     });
-    getPref<LayerKey>("mapLayer").then((saved) => {
-      if (saved && saved in LAYER_LABELS) setLayer(saved);
-    });
-    getPref<boolean>("elevationExpanded").then((saved) => {
-      if (typeof saved === "boolean") setElevationExpanded(saved);
-    });
-    getPref<boolean>("cursorEnabled").then((saved) => {
-      if (typeof saved === "boolean") setCursorEnabled(saved);
-    });
+    void (async () => {
+      const savedLayer = await getPref<LayerKey>("mapLayer");
+      if (savedLayer && savedLayer in LAYER_LABELS) setLayer(savedLayer);
+      const savedExpanded = await getPref<boolean>("elevationExpanded");
+      if (typeof savedExpanded === "boolean") setElevationExpanded(savedExpanded);
+      const savedCursor = await getPref<boolean>("cursorEnabled");
+      if (typeof savedCursor === "boolean") setCursorEnabled(savedCursor);
+      setPrefsLoaded(true);
+    })();
   }, []);
+
 
   // Remember the last selected track across sessions
   useEffect(() => {
     if (selectedId) void setPref("selectedTrackId", selectedId);
   }, [selectedId]);
 
-  // Remember the chosen base map layer across sessions
+  // Remember the chosen base map layer across sessions (skip until prefs loaded)
   useEffect(() => {
+    if (!prefsLoaded) return;
     void setPref("mapLayer", layer);
-  }, [layer]);
+  }, [layer, prefsLoaded]);
+
 
   // Remember elevation drawer state across sessions
   useEffect(() => {
@@ -377,7 +377,7 @@ function HomePage() {
   return (
     <div
       className={cn(
-        "flex h-screen flex-col bg-background text-foreground",
+        "flex h-screen h-[100dvh] w-full max-w-full flex-col overflow-x-hidden bg-background text-foreground",
         dragOver && "ring-4 ring-primary ring-inset",
       )}
       onDragOver={(e) => {
@@ -837,29 +837,41 @@ function HomePage() {
             {/* Drawer header / handle */}
             <div className="flex items-center justify-between gap-2 px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Profilo altimetrico
+                <h2 className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {statsOpen ? "Dettagli traccia" : "Profilo altimetrico"}
                 </h2>
                 {selected && (
                   <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
-                  onClick={() => setStatsOpen(true)}
+                  onClick={() => {
+                    setStatsOpen((v) => !v);
+                    setElevationExpanded(true);
+                  }}
                   disabled={!stats}
                   className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
-                  title="Dettagli della traccia"
-                  aria-label="Dettagli della traccia"
+                  title={statsOpen ? "Torna all'altimetria" : "Dettagli della traccia"}
+                  aria-label={statsOpen ? "Torna all'altimetria" : "Dettagli della traccia"}
                 >
-                  <ClipboardList className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Dettagli traccia</span>
-                  <span className="sm:hidden">Dettagli</span>
+                  {statsOpen ? (
+                    <>
+                      <X className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Altimetria</span>
+                    </>
+                  ) : (
+                    <>
+                      <ClipboardList className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Dettagli traccia</span>
+                      <span className="sm:hidden">Dettagli</span>
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => setElevationExpanded((v) => !v)}
                   className="rounded p-1 text-muted-foreground transition hover:text-foreground sm:hidden"
-                  aria-label={elevationExpanded ? "Riduci altimetria" : "Espandi altimetria"}
+                  aria-label={elevationExpanded ? "Riduci pannello" : "Espandi pannello"}
                   title={elevationExpanded ? "Riduci" : "Espandi"}
                 >
                   <ChevronDown
@@ -876,33 +888,28 @@ function HomePage() {
                 elevationExpanded ? "max-h-[55vh] opacity-100 p-3 pt-0" : "max-h-0 opacity-0 px-3",
               )}
             >
-              <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
-                <div className="h-[180px] sm:h-[220px]">
-                  {stats ? (
-                    <ElevationChart profile={stats.profile} onHover={setHoverPoint} />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                      Carica una traccia GPX per iniziare
-                    </div>
-                  )}
+              {statsOpen && stats ? (
+                <div className="max-h-[48vh] overflow-y-auto rounded-xl border border-border bg-card p-2">
+                  <StatsPanel stats={stats} />
                 </div>
-              </div>
+              ) : (
+                <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
+                  <div className="h-[180px] sm:h-[220px]">
+                    {stats ? (
+                      <ElevationChart profile={stats.profile} onHover={setHoverPoint} />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                        Carica una traccia GPX per iniziare
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         </main>
       </div>
 
-      {/* Track details modal — rendered at root level so it is not clipped by the bottom panel */}
-      <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
-        <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="truncate">
-              {selected ? selected.name : "Dettagli traccia"}
-            </DialogTitle>
-          </DialogHeader>
-          {stats && <StatsPanel stats={stats} />}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
