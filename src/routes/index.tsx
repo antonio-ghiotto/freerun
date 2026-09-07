@@ -903,7 +903,15 @@ function HomePage() {
   );
 }
 
-function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
+function ThemeToggle({
+  theme,
+  setTheme,
+  showLabel,
+}: {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  showLabel?: boolean;
+}) {
   const order: Theme[] = ["light", "dark", "contrast"];
   const next = () => setTheme(order[(order.indexOf(theme) + 1) % order.length]);
   const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Contrast;
@@ -912,13 +920,12 @@ function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) =
   return (
     <button
       onClick={next}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
+      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
       title={`Tema: ${label}`}
       aria-label={`Cambia tema (attuale: ${label})`}
     >
       <Icon className="h-4 w-4" />
-      <span className="hidden sm:inline">{label}</span>
+      <span className={showLabel ? "" : "hidden sm:inline"}>{label}</span>
     </button>
-
   );
 }
