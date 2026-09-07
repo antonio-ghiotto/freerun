@@ -222,16 +222,17 @@ function HomePage() {
       if (match) setSelectedId(match.id);
       else if (all.length > 0) setSelectedId(all[0].id);
     });
-    getPref<LayerKey>("mapLayer").then((saved) => {
-      if (saved && saved in LAYER_LABELS) setLayer(saved);
-    });
-    getPref<boolean>("elevationExpanded").then((saved) => {
-      if (typeof saved === "boolean") setElevationExpanded(saved);
-    });
-    getPref<boolean>("cursorEnabled").then((saved) => {
-      if (typeof saved === "boolean") setCursorEnabled(saved);
-    });
+    void (async () => {
+      const savedLayer = await getPref<LayerKey>("mapLayer");
+      if (savedLayer && savedLayer in LAYER_LABELS) setLayer(savedLayer);
+      const savedExpanded = await getPref<boolean>("elevationExpanded");
+      if (typeof savedExpanded === "boolean") setElevationExpanded(savedExpanded);
+      const savedCursor = await getPref<boolean>("cursorEnabled");
+      if (typeof savedCursor === "boolean") setCursorEnabled(savedCursor);
+      setPrefsLoaded(true);
+    })();
   }, []);
+
 
   // Remember the last selected track across sessions
   useEffect(() => {
