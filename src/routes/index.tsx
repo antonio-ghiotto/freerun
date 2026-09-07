@@ -34,7 +34,7 @@ const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
 import { computeStats, distanceToTrack, parseGpx, type GpxTrack, type ProfilePoint } from "@/lib/gpx";
-import { deleteTrack, listTracks, saveTrack } from "@/lib/storage";
+import { deleteTrack, getPref, listTracks, saveTrack, setPref } from "@/lib/storage";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { TrackSearchDialog } from "@/components/TrackSearchDialog";
@@ -74,10 +74,10 @@ function HomePage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [offRouteMeters, setOffRouteMeters] = useState(20);
-  const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
+  const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(false);
   const [offRoute, setOffRoute] = useState(false);
   const [offRouteDistance, setOffRouteDistance] = useState<number | null>(null);
-  const [keepAwake, setKeepAwake] = useState(true);
+  const [keepAwake, setKeepAwake] = useState(false);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -205,11 +205,19 @@ function HomePage() {
   }, [releaseWakeLock]);
 
   useEffect(() => {
-    listTracks().then((all) => {
+    listTracks().then(async (all) => {
       setTracks(all);
-      if (all.length > 0) setSelectedId(all[0].id);
+      const lastId = await getPref<string>("selectedTrackId");
+      const match = lastId ? all.find((t) => t.id === lastId) : undefined;
+      if (match) setSelectedId(match.id);
+      else if (all.length > 0) setSelectedId(all[0].id);
     });
   }, []);
+
+  // Remember the last selected track across sessions
+  useEffect(() => {
+    if (selectedId) void setPref("selectedTrackId", selectedId);
+  }, [selectedId]);
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
