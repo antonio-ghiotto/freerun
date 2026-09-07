@@ -28,7 +28,15 @@ import {
   Smartphone,
   Settings,
   ChevronDown,
+  ClipboardList,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
 import { ElevationChart } from "@/components/ElevationChart";
@@ -68,6 +76,7 @@ function HomePage() {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -292,9 +301,11 @@ function HomePage() {
   const selected = tracks.find((t) => t.id === selectedId) ?? null;
   const stats = useMemo(() => (selected ? computeStats(selected) : null), [selected]);
 
-  // Off-route detection: alert when the user strays too far from the selected track
+  // Off-route detection: alert when the user strays too far from the selected track.
+  // Runs only when the user explicitly armed the alarm or follow-me mode.
+  const offRouteWatch = offRouteAlertEnabled || followUser;
   useEffect(() => {
-    if (!userPos || !selected || selected.points.length === 0) {
+    if (!offRouteWatch || !userPos || !selected || selected.points.length === 0) {
       setOffRoute(false);
       setOffRouteDistance(null);
       return;
@@ -314,7 +325,7 @@ function HomePage() {
       // reset the throttle so the next departure alerts immediately
       lastBeepRef.current = 0;
     }
-  }, [userPos, selected, offRouteMeters, offRouteAlertEnabled, playAlarm]);
+  }, [offRouteWatch, userPos, selected, offRouteMeters, offRouteAlertEnabled, playAlarm]);
 
   const filteredSorted = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -701,7 +712,7 @@ function HomePage() {
               <button
                 onClick={() => (userPos ? stopGeo() : startGeo())}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                  "inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted",
                   userPos && "border-primary text-primary",
                 )}
                 title={userPos ? "Interrompi tracciamento posizione" : "Mostra la mia posizione"}
@@ -715,7 +726,7 @@ function HomePage() {
                 <button
                   onClick={() => setFollowUser((v) => !v)}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                    "inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted",
                     followUser && "border-primary text-primary",
                   )}
                   title={followUser ? "Smetti di seguire" : "Segui posizione"}
@@ -726,7 +737,7 @@ function HomePage() {
               )}
               <button
                 onClick={() => setMapFullscreen((v) => !v)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted"
+                className="inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted"
                 title={mapFullscreen ? "Riduci mappa" : "Mappa a tutto schermo"}
               >
                 {mapFullscreen ? (
@@ -765,16 +776,39 @@ function HomePage() {
 
 
 
-          {/* Bottom panel: elevation + stats */}
-          <section className="grid max-h-[55vh] grid-cols-1 gap-3 overflow-y-auto border-t border-border bg-background p-3 lg:grid-cols-[minmax(0,1fr)_360px]">
+          {/* Bottom panel: elevation only; stats open on demand */}
+          <section className="max-h-[55vh] overflow-y-auto border-t border-border bg-background p-3">
             <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
-              <div className="mb-1 flex items-center justify-between px-1">
+              <div className="mb-1 flex items-center justify-between gap-2 px-1">
                 <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Profilo altimetrico
                 </h2>
-                {selected && (
-                  <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
-                )}
+                <div className="flex min-w-0 items-center gap-2">
+                  {selected && (
+                    <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
+                  )}
+                  <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        disabled={!stats}
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
+                        title="Dettagli della traccia"
+                        aria-label="Dettagli della traccia"
+                      >
+                        <ClipboardList className="h-3.5 w-3.5" />
+                        Dettagli traccia
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="truncate">
+                          {selected ? selected.name : "Dettagli traccia"}
+                        </DialogTitle>
+                      </DialogHeader>
+                      {stats && <StatsPanel stats={stats} />}
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
               <div className="h-[180px] sm:h-[220px]">
                 {stats ? (
@@ -787,19 +821,6 @@ function HomePage() {
                 )}
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-2">
-              <h2 className="mb-1 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Statistiche
-              </h2>
-              {stats ? (
-                <StatsPanel stats={stats} />
-              ) : (
-                <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                  Le statistiche complete della traccia selezionata appariranno qui.
-                </div>
-              )}
-            </div>
-
           </section>
         </main>
       </div>
