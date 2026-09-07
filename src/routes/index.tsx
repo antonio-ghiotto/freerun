@@ -744,10 +744,10 @@ function HomePage() {
         </aside>
 
         {/* Map + panel */}
-        <main className="grid min-h-0 grid-rows-[1fr_auto]">
+        <main className="grid min-h-0 min-w-0 grid-rows-[1fr_auto]">
           <div
             className={cn(
-              "relative min-h-0",
+              "relative min-h-0 min-w-0 overflow-hidden",
               mapFullscreen && "fixed inset-0 z-[1000] bg-background",
             )}
           >
