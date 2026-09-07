@@ -88,6 +88,8 @@ function HomePage() {
   const [keepAwake, setKeepAwake] = useState(false);
   const [elevationExpanded, setElevationExpanded] = useState(true);
   const [cursorEnabled, setCursorEnabled] = useState(true);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
