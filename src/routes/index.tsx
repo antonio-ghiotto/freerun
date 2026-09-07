@@ -757,7 +757,9 @@ function HomePage() {
                   tracks={tracks}
                   layer={layer}
                   hoverPoint={hoverPoint}
-                  onCursorMove={(lat, lon) => setCursorLatLng({ lat, lon })}
+                  onCursorMove={(lat, lon) => {
+                    if (cursorEnabled) setCursorLatLng({ lat, lon });
+                  }}
                   userPosition={userPos}
                   followUser={followUser}
                 />
