@@ -452,7 +452,7 @@ function HomePage() {
       />
 
       {/* Body */}
-      <div className="relative grid min-h-0 flex-1 grid-cols-1">
+      <div className="relative grid min-h-0 min-w-0 flex-1 grid-cols-[minmax(0,1fr)]">
         {/* Sidebar drawer */}
         {sidebarOpen && (
           <div
@@ -744,10 +744,10 @@ function HomePage() {
         </aside>
 
         {/* Map + panel */}
-        <main className="grid min-h-0 grid-rows-[1fr_auto]">
+        <main className="grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto]">
           <div
             className={cn(
-              "relative min-h-0",
+              "relative min-h-0 min-w-0 overflow-hidden",
               mapFullscreen && "fixed inset-0 z-[1000] bg-background",
             )}
           >
