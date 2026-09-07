@@ -744,7 +744,7 @@ function HomePage() {
         </aside>
 
         {/* Map + panel */}
-        <main className="grid min-h-0 min-w-0 grid-rows-[1fr_auto]">
+        <main className="grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto]">
           <div
             className={cn(
               "relative min-h-0 min-w-0 overflow-hidden",
