@@ -74,10 +74,10 @@ function HomePage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [offRouteMeters, setOffRouteMeters] = useState(20);
-  const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(true);
+  const [offRouteAlertEnabled, setOffRouteAlertEnabled] = useState(false);
   const [offRoute, setOffRoute] = useState(false);
   const [offRouteDistance, setOffRouteDistance] = useState<number | null>(null);
-  const [keepAwake, setKeepAwake] = useState(true);
+  const [keepAwake, setKeepAwake] = useState(false);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
