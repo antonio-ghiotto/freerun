@@ -35,7 +35,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
