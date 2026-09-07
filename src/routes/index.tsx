@@ -29,6 +29,7 @@ import {
   Settings,
   ChevronDown,
   ClipboardList,
+  TrendingUp,
 } from "lucide-react";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
 
@@ -837,11 +838,8 @@ function HomePage() {
             {/* Drawer header / handle */}
             <div className="flex items-center justify-between gap-2 px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {statsOpen ? "Dettagli traccia" : "Profilo altimetrico"}
-                </h2>
                 {selected && (
-                  <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
+                  <div className="truncate text-sm font-medium text-foreground">{selected.name}</div>
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -852,13 +850,13 @@ function HomePage() {
                   }}
                   disabled={!stats}
                   className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
-                  title={statsOpen ? "Torna all'altimetria" : "Dettagli della traccia"}
-                  aria-label={statsOpen ? "Torna all'altimetria" : "Dettagli della traccia"}
+                  title={statsOpen ? "Torna al profilo altimetrico" : "Dettagli della traccia"}
+                  aria-label={statsOpen ? "Torna al profilo altimetrico" : "Dettagli della traccia"}
                 >
                   {statsOpen ? (
                     <>
-                      <X className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Altimetria</span>
+                      <TrendingUp className="h-3.5 w-3.5" />
+                      <span>Profilo</span>
                     </>
                   ) : (
                     <>
