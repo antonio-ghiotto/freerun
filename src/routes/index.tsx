@@ -391,55 +391,19 @@ function HomePage() {
       <Toaster theme={theme === "light" ? "light" : "dark"} position="top-right" />
 
       {/* Header */}
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 sm:flex sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-border bg-background text-foreground transition hover:bg-muted"
-            title="Apri menu"
-            aria-label="Apri menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <Mountain className="h-5 w-5" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="truncate font-display text-lg font-bold sm:text-xl">
-              FreeRun — Visualizzatore e analizzatore GPX offline
-            </h1>
-            <p className="truncate text-xs text-muted-foreground">
-              Analisi GPX · Offline · Open Source
-
-            </p>
-          </div>
+      <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-border bg-background text-foreground transition hover:bg-muted"
+          title="Apri menu"
+          aria-label="Apri menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+          <Mountain className="h-5 w-5" />
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <ThemeToggle theme={theme} setTheme={setTheme} />
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium transition hover:bg-muted"
-            title="Cerca percorsi online"
-          >
-            <Search className="h-4 w-4" />
-            <span className="hidden sm:inline">Cerca online</span>
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
-          >
-            <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">Carica GPX</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".gpx,application/gpx+xml,text/xml"
-            multiple
-            className="hidden"
-            onChange={(e) => e.target.files && handleFiles(e.target.files)}
-          />
-        </div>
+        <h1 className="font-display text-lg font-bold sm:text-xl">FreeRun</h1>
       </header>
 
       <TrackSearchDialog
@@ -476,6 +440,33 @@ function HomePage() {
             >
               <X className="h-4 w-4" />
             </button>
+          </div>
+
+          <div className="grid gap-2 border-b border-border p-3">
+            <ThemeToggle theme={theme} setTheme={setTheme} showLabel />
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium transition hover:bg-muted"
+              title="Cerca percorsi online"
+            >
+              <Search className="h-4 w-4" />
+              Cerca online
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
+            >
+              <Upload className="h-4 w-4" />
+              Carica GPX
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".gpx,application/gpx+xml,text/xml"
+              multiple
+              className="hidden"
+              onChange={(e) => e.target.files && handleFiles(e.target.files)}
+            />
           </div>
 
           <AppRating />
@@ -912,7 +903,15 @@ function HomePage() {
   );
 }
 
-function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
+function ThemeToggle({
+  theme,
+  setTheme,
+  showLabel,
+}: {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  showLabel?: boolean;
+}) {
   const order: Theme[] = ["light", "dark", "contrast"];
   const next = () => setTheme(order[(order.indexOf(theme) + 1) % order.length]);
   const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Contrast;
@@ -921,13 +920,12 @@ function ThemeToggle({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) =
   return (
     <button
       onClick={next}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
+      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium hover:bg-muted"
       title={`Tema: ${label}`}
       aria-label={`Cambia tema (attuale: ${label})`}
     >
       <Icon className="h-4 w-4" />
-      <span className="hidden sm:inline">{label}</span>
+      <span className={showLabel ? "" : "hidden sm:inline"}>{label}</span>
     </button>
-
   );
 }
