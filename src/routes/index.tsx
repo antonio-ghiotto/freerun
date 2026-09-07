@@ -35,7 +35,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
@@ -795,27 +794,16 @@ function HomePage() {
                   {selected && (
                     <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
                   )}
-                  <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
-                    <DialogTrigger asChild>
-                      <button
-                        disabled={!stats}
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
-                        title="Dettagli della traccia"
-                        aria-label="Dettagli della traccia"
-                      >
-                        <ClipboardList className="h-3.5 w-3.5" />
-                        Dettagli traccia
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="truncate">
-                          {selected ? selected.name : "Dettagli traccia"}
-                        </DialogTitle>
-                      </DialogHeader>
-                      {stats && <StatsPanel stats={stats} />}
-                    </DialogContent>
-                  </Dialog>
+                  <button
+                    onClick={() => setStatsOpen(true)}
+                    disabled={!stats}
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
+                    title="Dettagli della traccia"
+                    aria-label="Dettagli della traccia"
+                  >
+                    <ClipboardList className="h-3.5 w-3.5" />
+                    Dettagli traccia
+                  </button>
                 </div>
               </div>
               <div className="h-[180px] sm:h-[220px]">
@@ -832,6 +820,18 @@ function HomePage() {
           </section>
         </main>
       </div>
+
+      {/* Track details modal — rendered at root level so it is not clipped by the bottom panel */}
+      <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
+        <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="truncate">
+              {selected ? selected.name : "Dettagli traccia"}
+            </DialogTitle>
+          </DialogHeader>
+          {stats && <StatsPanel stats={stats} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
