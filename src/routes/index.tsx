@@ -221,12 +221,20 @@ function HomePage() {
       if (match) setSelectedId(match.id);
       else if (all.length > 0) setSelectedId(all[0].id);
     });
+    getPref<LayerKey>("mapLayer").then((saved) => {
+      if (saved && saved in LAYER_LABELS) setLayer(saved);
+    });
   }, []);
 
   // Remember the last selected track across sessions
   useEffect(() => {
     if (selectedId) void setPref("selectedTrackId", selectedId);
   }, [selectedId]);
+
+  // Remember the chosen base map layer across sessions
+  useEffect(() => {
+    void setPref("mapLayer", layer);
+  }, [layer]);
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
