@@ -832,38 +832,60 @@ function HomePage() {
 
 
 
-          {/* Bottom panel: elevation only; stats open on demand */}
-          <section className="max-h-[55vh] overflow-y-auto border-t border-border bg-background p-3">
-            <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
-              <div className="mb-1 flex items-center justify-between gap-2 px-1">
+          {/* Bottom elevation drawer: reducible on mobile to free the map */}
+          <section className="border-t border-border bg-background">
+            {/* Drawer header / handle */}
+            <div className="flex items-center justify-between gap-2 px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Profilo altimetrico
                 </h2>
-                <div className="flex min-w-0 items-center gap-2">
-                  {selected && (
-                    <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
-                  )}
-                  <button
-                    onClick={() => setStatsOpen(true)}
-                    disabled={!stats}
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
-                    title="Dettagli della traccia"
-                    aria-label="Dettagli della traccia"
-                  >
-                    <ClipboardList className="h-3.5 w-3.5" />
-                    Dettagli traccia
-                  </button>
-                </div>
-              </div>
-              <div className="h-[180px] sm:h-[220px]">
-                {stats ? (
-                  <ElevationChart profile={stats.profile} onHover={setHoverPoint} />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                    Carica una traccia GPX per iniziare
-
-                  </div>
+                {selected && (
+                  <div className="truncate text-xs text-muted-foreground">{selected.name}</div>
                 )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setStatsOpen(true)}
+                  disabled={!stats}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
+                  title="Dettagli della traccia"
+                  aria-label="Dettagli della traccia"
+                >
+                  <ClipboardList className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Dettagli traccia</span>
+                  <span className="sm:hidden">Dettagli</span>
+                </button>
+                <button
+                  onClick={() => setElevationExpanded((v) => !v)}
+                  className="rounded p-1 text-muted-foreground transition hover:text-foreground sm:hidden"
+                  aria-label={elevationExpanded ? "Riduci altimetria" : "Espandi altimetria"}
+                  title={elevationExpanded ? "Riduci" : "Espandi"}
+                >
+                  <ChevronDown
+                    className={cn("h-4 w-4 transition-transform", elevationExpanded && "rotate-180")}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Drawer content */}
+            <div
+              className={cn(
+                "overflow-hidden transition-all duration-300 ease-out sm:max-h-[55vh] sm:opacity-100 sm:p-3",
+                elevationExpanded ? "max-h-[55vh] opacity-100 p-3 pt-0" : "max-h-0 opacity-0 px-3",
+              )}
+            >
+              <div className="min-h-[180px] rounded-xl border border-border bg-card p-2">
+                <div className="h-[180px] sm:h-[220px]">
+                  {stats ? (
+                    <ElevationChart profile={stats.profile} onHover={setHoverPoint} />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      Carica una traccia GPX per iniziare
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </section>
