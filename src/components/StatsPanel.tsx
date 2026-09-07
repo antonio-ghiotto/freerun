@@ -5,13 +5,6 @@ interface Props {
   stats: TrackStats;
 }
 
-const DIFF_LABELS: Record<TrackStats["difficulty"], { label: string; color: string; desc: string }> = {
-  T: { label: "T — Turistico", color: "bg-emerald-500", desc: "Percorsi brevi su strade o sentieri facili." },
-  E: { label: "E — Escursionistico", color: "bg-sky-500", desc: "Sentieri segnalati, terreno vario." },
-  EE: { label: "EE — Escursionisti Esperti", color: "bg-amber-500", desc: "Terreno impegnativo, tratti esposti." },
-  EEA: { label: "EEA — Esperti Attrezzati", color: "bg-red-600", desc: "Vie ferrate, richiede attrezzatura." },
-};
-
 function Cell({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card p-3">
