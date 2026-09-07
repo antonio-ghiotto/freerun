@@ -452,7 +452,7 @@ function HomePage() {
       />
 
       {/* Body */}
-      <div className="relative grid min-h-0 flex-1 grid-cols-1">
+      <div className="relative grid min-h-0 min-w-0 flex-1 grid-cols-[minmax(0,1fr)]">
         {/* Sidebar drawer */}
         {sidebarOpen && (
           <div
