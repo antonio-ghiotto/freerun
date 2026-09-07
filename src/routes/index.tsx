@@ -442,6 +442,33 @@ function HomePage() {
             </button>
           </div>
 
+          <div className="grid gap-2 border-b border-border p-3">
+            <ThemeToggle theme={theme} setTheme={setTheme} showLabel />
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium transition hover:bg-muted"
+              title="Cerca percorsi online"
+            >
+              <Search className="h-4 w-4" />
+              Cerca online
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
+            >
+              <Upload className="h-4 w-4" />
+              Carica GPX
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".gpx,application/gpx+xml,text/xml"
+              multiple
+              className="hidden"
+              onChange={(e) => e.target.files && handleFiles(e.target.files)}
+            />
+          </div>
+
           <AppRating />
         
 
