@@ -65,7 +65,7 @@ interface Props {
 export function MapView({ tracks, layer, hoverPoint, onCursorMove, userPosition, followUser }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const tileRef = useRef<L.TileLayer | null>(null);
+  const tileRef = useRef<L.LayerGroup | null>(null);
   const trackLayersRef = useRef<Map<string, L.LayerGroup>>(new Map());
   const cursorMarkerRef = useRef<L.CircleMarker | null>(null);
   const userMarkerRef = useRef<L.LayerGroup | null>(null);
