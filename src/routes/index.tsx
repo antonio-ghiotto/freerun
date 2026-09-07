@@ -86,6 +86,8 @@ function HomePage() {
   const [offRoute, setOffRoute] = useState(false);
   const [offRouteDistance, setOffRouteDistance] = useState<number | null>(null);
   const [keepAwake, setKeepAwake] = useState(false);
+  const [elevationExpanded, setElevationExpanded] = useState(true);
+  const [cursorEnabled, setCursorEnabled] = useState(true);
   const geoWatchRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -222,6 +224,12 @@ function HomePage() {
     });
     getPref<LayerKey>("mapLayer").then((saved) => {
       if (saved && saved in LAYER_LABELS) setLayer(saved);
+    });
+    getPref<boolean>("elevationExpanded").then((saved) => {
+      if (typeof saved === "boolean") setElevationExpanded(saved);
+    });
+    getPref<boolean>("cursorEnabled").then((saved) => {
+      if (typeof saved === "boolean") setCursorEnabled(saved);
     });
   }, []);
 
