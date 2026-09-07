@@ -243,6 +243,17 @@ function HomePage() {
     void setPref("mapLayer", layer);
   }, [layer]);
 
+  // Remember elevation drawer state across sessions
+  useEffect(() => {
+    void setPref("elevationExpanded", elevationExpanded);
+  }, [elevationExpanded]);
+
+  // Remember cursor coordinates toggle and clear cursor when disabled
+  useEffect(() => {
+    void setPref("cursorEnabled", cursorEnabled);
+    if (!cursorEnabled) setCursorLatLng(null);
+  }, [cursorEnabled]);
+
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
       const added: GpxTrack[] = [];
