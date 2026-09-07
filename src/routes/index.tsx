@@ -238,10 +238,12 @@ function HomePage() {
     if (selectedId) void setPref("selectedTrackId", selectedId);
   }, [selectedId]);
 
-  // Remember the chosen base map layer across sessions
+  // Remember the chosen base map layer across sessions (skip until prefs loaded)
   useEffect(() => {
+    if (!prefsLoaded) return;
     void setPref("mapLayer", layer);
-  }, [layer]);
+  }, [layer, prefsLoaded]);
+
 
   // Remember elevation drawer state across sessions
   useEffect(() => {
