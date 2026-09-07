@@ -377,7 +377,7 @@ function HomePage() {
   return (
     <div
       className={cn(
-        "flex h-screen flex-col bg-background text-foreground",
+        "flex h-screen h-[100dvh] w-full max-w-full flex-col overflow-x-hidden bg-background text-foreground",
         dragOver && "ring-4 ring-primary ring-inset",
       )}
       onDragOver={(e) => {
