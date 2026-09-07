@@ -5,13 +5,6 @@ interface Props {
   stats: TrackStats;
 }
 
-const DIFF_LABELS: Record<TrackStats["difficulty"], { label: string; color: string; desc: string }> = {
-  T: { label: "T — Turistico", color: "bg-emerald-500", desc: "Percorsi brevi su strade o sentieri facili." },
-  E: { label: "E — Escursionistico", color: "bg-sky-500", desc: "Sentieri segnalati, terreno vario." },
-  EE: { label: "EE — Escursionisti Esperti", color: "bg-amber-500", desc: "Terreno impegnativo, tratti esposti." },
-  EEA: { label: "EEA — Esperti Attrezzati", color: "bg-red-600", desc: "Vie ferrate, richiede attrezzatura." },
-};
-
 function Cell({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card p-3">
@@ -24,17 +17,8 @@ function Cell({ label, value, sub }: { label: string; value: React.ReactNode; su
 
 export function StatsPanel({ stats }: Props) {
   const km = (stats.distance / 1000).toFixed(2);
-  const d = DIFF_LABELS[stats.difficulty];
   return (
     <div className="space-y-3">
-      <div className={`flex items-center gap-3 rounded-lg border border-border p-3`}>
-        <span className={`inline-block h-3 w-3 rounded-full ${d.color}`} />
-        <div className="min-w-0">
-          <div className="font-semibold text-foreground">{d.label}</div>
-          <div className="truncate text-xs text-muted-foreground">{d.desc}</div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Cell label="Distanza" value={`${km} km`} />
         <Cell label="Dislivello +" value={`${Math.round(stats.ascent)} m`} />
