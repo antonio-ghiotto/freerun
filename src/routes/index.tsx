@@ -68,6 +68,7 @@ function HomePage() {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [userPos, setUserPos] = useState<{ lat: number; lon: number; accuracy?: number } | null>(null);
   const [followUser, setFollowUser] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -703,7 +704,7 @@ function HomePage() {
               <button
                 onClick={() => (userPos ? stopGeo() : startGeo())}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                  "inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted",
                   userPos && "border-primary text-primary",
                 )}
                 title={userPos ? "Interrompi tracciamento posizione" : "Mostra la mia posizione"}
@@ -717,7 +718,7 @@ function HomePage() {
                 <button
                   onClick={() => setFollowUser((v) => !v)}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted",
+                    "inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted",
                     followUser && "border-primary text-primary",
                   )}
                   title={followUser ? "Smetti di seguire" : "Segui posizione"}
@@ -728,7 +729,7 @@ function HomePage() {
               )}
               <button
                 onClick={() => setMapFullscreen((v) => !v)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/95 px-2.5 py-2 text-xs font-medium shadow backdrop-blur hover:bg-muted"
+                className="inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/30 bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur hover:bg-muted"
                 title={mapFullscreen ? "Riduci mappa" : "Mappa a tutto schermo"}
               >
                 {mapFullscreen ? (
