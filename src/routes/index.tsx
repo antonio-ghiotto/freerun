@@ -603,6 +603,36 @@ function HomePage() {
               il browser sospende il tracciamento.
             </p>
           </div>
+
+          <div className="border-b border-border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" /> Coordinate cursore
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={cursorEnabled}
+                aria-label="Coordinate cursore"
+                onClick={() => setCursorEnabled((v) => !v)}
+                className={cn(
+                  "relative h-5 w-9 shrink-0 rounded-full transition",
+                  cursorEnabled ? "bg-primary" : "bg-muted",
+                )}
+                title={cursorEnabled ? "Nascondi coordinate" : "Mostra coordinate"}
+              >
+                <span
+                  className={cn(
+                    "absolute top-0.5 h-4 w-4 rounded-full bg-background transition-all",
+                    cursorEnabled ? "left-[18px]" : "left-0.5",
+                  )}
+                />
+              </button>
+            </div>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">
+              Mostra le coordinate geografiche del cursore mentre passi sopra la mappa.
+            </p>
+          </div>
           </>
           )}
 
