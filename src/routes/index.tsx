@@ -30,13 +30,8 @@ import {
   ChevronDown,
   ClipboardList,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { LAYER_LABELS, type LayerKey } from "@/components/mapLayers";
+
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));
 import { ElevationChart } from "@/components/ElevationChart";
 import { StatsPanel } from "@/components/StatsPanel";
