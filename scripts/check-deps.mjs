@@ -22,6 +22,14 @@ const GUARDED = [
   "react-dom",
 ];
 
+/** Build-time tooling: nested copies there never affect app types. */
+const IGNORED_HOSTS = [
+  "@tanstack/router-generator",
+  "@tanstack/router-plugin",
+  "@tanstack/start-plugin-core",
+  "@tanstack/devtools-vite",
+];
+
 const problems = [];
 
 function readVersion(dir) {
@@ -45,6 +53,8 @@ function findNestedCopies(name) {
       ? readdirSync(base).map((sub) => join(base, sub))
       : [base];
     for (const pkgDir of candidates) {
+      const hostName = pkgDir.replace(`${NM}/`, "");
+      if (IGNORED_HOSTS.includes(hostName)) continue;
       const nested = join(pkgDir, "node_modules", ...name.split("/"));
       const version = readVersion(nested);
       if (version) found.push({ path: nested.replace(`${ROOT}/`, ""), version });
